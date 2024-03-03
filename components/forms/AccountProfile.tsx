@@ -19,8 +19,11 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { useUploadThing } from '@/lib/uploadthing';
+import { updateUser } from '@/lib/actions/user.actions';
+import { usePathname, useRouter } from 'next/navigation';
 type Props = {
     user: {
+        id: string;
         profile_photo: string;
         name: string;
         username: string;
@@ -29,6 +32,8 @@ type Props = {
 };
 const AccountProfile = ({ user, btnTitle }: Props) => {
     const [files, setFiles] = useState<File[]>([]);
+    const pathname = usePathname();
+    const router = useRouter();
     const { startUpload } = useUploadThing('media');
     const form = useForm({
         resolver: zodResolver(UserValidation),
@@ -70,6 +75,21 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
             }
         }
         //TODO: make api call and store the data
+        await updateUser({
+            userId: user.id,
+            username: values.username,
+            name: values.name,
+            bio: values.bio,
+            image: values.profile_photo,
+            path: pathname,
+        });
+        //if in update screen
+        if (pathname === '/profile/edit') {
+            router.back();
+        } else {
+            //in onboarding then move again to /
+            router.push('/');
+        }
     };
     return (
         <div>

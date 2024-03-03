@@ -4,10 +4,14 @@ import React from 'react';
 
 const OnBoarding = async () => {
     const user = await currentUser();
+    if (!user) {
+        return null; // for avoiding typescript warnings
+    }
     const userData = {
-        profile_photo: user?.imageUrl || '',
-        name: user?.firstName || '',
-        username: user?.username || '',
+        id: user.id,
+        profile_photo: user.imageUrl,
+        name: user.firstName ?? '',
+        username: user.username ?? '',
     };
     return (
         <main className="mx-auto flex max-w-3xl flex-col justify-start px-10 py-20">
