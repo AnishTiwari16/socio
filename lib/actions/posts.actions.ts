@@ -55,3 +55,71 @@ export const fetchPost = async (pageNumber = 1, pageSize = 20) => {
         );
     }
 };
+export const fetchPostById = async (id: string) => {
+    try {
+        connectToDB();
+        const post = await Posts.findById(id)
+            .populate({
+                path: 'author',
+                model: User,
+                select: '_id id name image',
+            })
+            .populate({
+                path: 'children',
+                populate: [
+                    {
+                        path: 'author',
+                        model: User,
+                        select: '_id id name parentId image',
+                    },
+                    {
+                        path: 'children',
+                        model: Posts,
+                        populate: {
+                            path: 'author',
+                            model: User,
+                            select: '_id id image parentId name',
+                        },
+                    },
+                ],
+            })
+            .exec();
+        return post;
+    } catch (error: any) {
+        throw new Error(
+            `Something went wrong while fetching post: ${error.message}`
+        );
+    }
+};
+//commenting on a post
+export const commentOnPost = async (
+    postId: string,
+    commentedText: string,
+    userId: string,
+    path: string
+) => {
+    try {
+        connectToDB();
+        //we will fetch the original post by id
+        const originalPost = await Posts.findById(postId);
+        if (!originalPost) {
+            throw new Error('Post not found');
+        }
+        //now create a new post wrt sub comment
+        const commentedPost = new Posts({
+            text: commentedText,
+            author: userId,
+            parentId: postId,
+        });
+        //save the new post
+        const savedNewPost = await commentedPost.save();
+        //now we will append the new commented post into original post as the commented will be children of original as it is a comment
+        originalPost.children.push(savedNewPost._id);
+        await originalPost.save();
+        revalidatePath(path);
+    } catch (error: any) {
+        throw new Error(
+            `Something went wrong while commenting on post: ${error.message}`
+        );
+    }
+};
