@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 interface Props {
     id: string;
     currentUserId: string;
@@ -37,7 +36,9 @@ const PostsCards = ({
 }: Props) => {
     return (
         <article
-            className={`flex w-full flex-col rounded-xlbg-dark-2 p-7 bg-dark-2`}
+            className={`flex w-full flex-col rounded-xl ${
+                isComment ? 'px-0 xs:px-7' : 'bg-dark-2 p-7'
+            }`}
         >
             <div className="flex items-start justify-between">
                 <div className="flex w-full flex-1 flex-row gap-4">
@@ -53,7 +54,7 @@ const PostsCards = ({
                                 className="cursor-pointer rounded-full"
                             />
                         </Link>
-                        {isComment && <div className="post-card_bar" />}
+                        {<div className="post-card_bar" />}
                     </div>
                     <div className="flex w-full flex-col">
                         <Link href={`/profile/${author.id}`} className="w-fit">

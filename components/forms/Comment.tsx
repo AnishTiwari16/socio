@@ -28,8 +28,8 @@ interface Props {
 function Comment({ postId, currentUserImg, currentUserId }: Props) {
     const pathname = usePathname();
 
-    const form = useForm<z.infer<typeof PostsValidation>>({
-        resolver: zodResolver(PostsValidation),
+    const form = useForm<z.infer<typeof CommentValidation>>({
+        resolver: zodResolver(CommentValidation),
         defaultValues: {
             post: '',
         },
